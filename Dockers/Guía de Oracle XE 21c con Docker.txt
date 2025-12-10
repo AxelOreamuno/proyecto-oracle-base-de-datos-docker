@@ -1,0 +1,34 @@
+Este proyecto requiere dos bases de datos Oracle XE 21c corriendo en contenedores Docker:
+
+oracle-local1 → Base de datos principal
+
+oracle-local2 → Base de respaldo
+
+Video de referencia:
+Contenedores Docker con Oracle DB
+https://www.youtube.com/watch?v=-W6IveU5Hvo
+
+Nota: En el video se utiliza la imagen más reciente de Oracle. Para este proyecto se utiliza 
+específicamente Oracle XE 21.3.0.
+
+
+Descargar la imagen de Oracle XE 21.3.0:
+docker pull container-registry.oracle.com/database/express:21.3.0-xe
+
+Crear el contenedor principal (oracle-local1) con la imagen que se descargo anteriormente:
+docker run -d --name "oracle-local1" -p 1521:1521 -e ORACLE_PWD="Local123" container-registry.oracle.com/database/express:21.3.0-xe
+
+Crear el segundo contenedor (oracle-local2)
+docker run -d --name "oracle-local2" -p 1522:1521 -e ORACLE_PWD="123Local" container-registry.oracle.com/database/express:21.3.0-xe
+
+Explicación de puertos
+Ambos contenedores usan internamente el puerto 1521, que es el estándar de Oracle.
+Para evitar conflictos en el host se realiza este mapeo:
+
+
+Contenedor	Puerto interno	Puerto host	Uso
+oracle-local1	     1521           1521	Principal
+oracle-local2	     1521	    1522	Respaldo
+
+
+Así, oracle-local2 sigue escuchando en 1521 dentro del contenedor, pero desde el host se accede por 1522, permitiendo que ambos funcionen simultáneamente.
